@@ -29,3 +29,8 @@ class BB:
 
     def poke(self, off, data):
         self.send(f"poke 0x{off:x} 0x{data.hex()}")
+
+    def title_id(self):
+        self.send("getTitleID")
+        r = self.recv()
+        return int(r, 16) if r else None
