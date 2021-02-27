@@ -1,8 +1,16 @@
-import socket, sys
+import socket, sys, time
 
 HOST = "192.168.1.50"
 BUTTONS = {"A","B","X","Y","L","R","ZL","ZR","PLUS","MINUS","HOME","CAPTURE",
            "DUP","DDOWN","DLEFT","DRIGHT","LSTICK","RSTICK","PALMA"}
+
+# sys-botbase quietly presses A for any name it doesn't know. so a typo
+# in a button becomes an A press on the console. check locally first.
+def norm(b):
+    b = b.upper()
+    if b not in BUTTONS:
+        raise ValueError(b)
+    return b
 
 class BB:
     def __init__(self, host=HOST):
@@ -20,8 +28,13 @@ class BB:
         return line.decode().rstrip("\r")
 
     def click(self, b):
-        assert b in BUTTONS, b
-        self.send(f"click {b}")
+        self.send("click " + norm(b))
+
+    def press(self, b):
+        self.send("press " + norm(b))
+
+    def release(self, b):
+        self.send("release " + norm(b))
 
     def peek(self, off, size):
         self.send(f"peek 0x{off:x} 0x{size:x}")
@@ -29,8 +42,3 @@ class BB:
 
     def poke(self, off, data):
         self.send(f"poke 0x{off:x} 0x{data.hex()}")
-
-    def title_id(self):
-        self.send("getTitleID")
-        r = self.recv()
-        return int(r, 16) if r else None
