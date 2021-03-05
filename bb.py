@@ -2,12 +2,13 @@ import socket, sys, time
 
 HOST = "192.168.1.50"
 BUTTONS = {"A","B","X","Y","L","R","ZL","ZR","PLUS","MINUS","HOME","CAPTURE",
-           "DUP","DDOWN","DLEFT","DRIGHT","LSTICK","RSTICK","PALMA"}
+           "DUP","DDOWN","DLEFT","DRIGHT","LSTICK","RSTICK","PALMA","UNUSED"}
+ALIAS = {"UP":"DUP","DOWN":"DDOWN","LEFT":"DLEFT","RIGHT":"DRIGHT",
+         "START":"PLUS","SELECT":"MINUS"}
 
-# sys-botbase quietly presses A for any name it doesn't know. so a typo
-# in a button becomes an A press on the console. check locally first.
 def norm(b):
-    b = b.upper()
+    b = b.upper().strip()
+    b = ALIAS.get(b, b)
     if b not in BUTTONS:
         raise ValueError(b)
     return b
@@ -27,14 +28,14 @@ class BB:
         line, self.buf = self.buf.split(b"\n", 1)
         return line.decode().rstrip("\r")
 
-    def click(self, b):
-        self.send("click " + norm(b))
+    def click(self, b): self.send("click " + norm(b))
+    def press(self, b): self.send("press " + norm(b))
+    def release(self, b): self.send("release " + norm(b))
 
-    def press(self, b):
-        self.send("press " + norm(b))
-
-    def release(self, b):
-        self.send("release " + norm(b))
+    def set_stick(self, side, x, y):
+        side = side.upper()
+        assert side in ("LEFT", "RIGHT")
+        self.send(f"setStick {side} 0x{x & 0xffff:x} 0x{y & 0xffff:x}")
 
     def peek(self, off, size):
         self.send(f"peek 0x{off:x} 0x{size:x}")
