@@ -40,3 +40,12 @@ class BB:
     def poke(self, off, data, region="heap"):
         cmd = {"heap":"poke","main":"pokeMain","absolute":"pokeAbsolute"}[region]
         self.send(f"{cmd} 0x{off:x} 0x{data.hex()}")
+
+    def pointer(self, chain):
+        self.send("pointer " + " ".join(f"0x{c:x}" for c in chain))
+        return int(self.recv(), 16)
+
+    def pointer_peek(self, size, chain, final=0):
+        args = " ".join(["0x%x" % size] + [f"0x{c:x}" for c in chain] + [f"0x{final:x}"])
+        self.send("pointerPeek " + args)
+        return bytes.fromhex(self.recv())
