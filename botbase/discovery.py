@@ -10,8 +10,10 @@ def probe(host, port=6000, timeout=0.5):
         s.settimeout(1.5)
         data = s.recv(32)
         line = data.split(b"\n", 1)[0].decode().strip()
+        # a getVersion reply looks like 1.5 or 2.0. a bare port-open check
+        # isn't enough because port 6000 is also x11.
         parts = line.split(".")
-        if all(p.isdigit() for p in parts):
+        if parts and all(p.isdigit() for p in parts):
             return line
     except OSError:
         return None
