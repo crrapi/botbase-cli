@@ -49,3 +49,13 @@ class BB:
         args = " ".join(["0x%x" % size] + [f"0x{c:x}" for c in chain] + [f"0x{final:x}"])
         self.send("pointerPeek " + args)
         return bytes.fromhex(self.recv())
+
+    def freeze(self, off, data):
+        self.send(f"freeze 0x{off:x} 0x{data.hex()}")
+
+    def unfreeze(self, off):
+        self.send(f"unFreeze 0x{off:x}")
+
+    def freeze_count(self):
+        self.send("freezeCount")
+        return int(self.recv(), 16)
