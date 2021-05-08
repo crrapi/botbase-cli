@@ -59,3 +59,10 @@ class BB:
     def freeze_count(self):
         self.send("freezeCount")
         return int(self.recv(), 16)
+
+    def touch(self, points):
+        args = " ".join(f"{x} {y}" for x, y in points)
+        self.send("touch " + args)
+
+    def touch_hold(self, x, y, ms):
+        self.send(f"touchHold {x} {y} {ms}")
