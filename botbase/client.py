@@ -61,6 +61,8 @@ class BB:
         return int(self.recv(), 16)
 
     def touch(self, points):
+        for x, y in points:
+            assert 0 <= x <= 1280 and 0 <= y <= 720, (x, y)
         args = " ".join(f"{x} {y}" for x, y in points)
         self.send("touch " + args)
 
