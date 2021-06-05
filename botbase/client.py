@@ -68,3 +68,6 @@ class BB:
 
     def touch_hold(self, x, y, ms):
         self.send(f"touchHold {x} {y} {ms}")
+
+    def key(self, *codes):
+        self.send("key " + " ".join(str(c) for c in codes))
