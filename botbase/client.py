@@ -71,3 +71,17 @@ class BB:
 
     def key(self, *codes):
         self.send("key " + " ".join(str(c) for c in codes))
+
+    def type_text(self, text):
+        # US layout only for now. shifted chars go as keyMulti chords because
+        # keyMod's Shift bit gets ignored by the system keyboard. dumb.
+        LETTERS = {c: (4 + i, c.isupper()) for i, c in enumerate("abcdefghijklmnopqrstuvwxyz")}
+        for c in text:
+            if c in LETTERS:
+                code, shift = LETTERS[c]
+                if shift:
+                    self.send(f"keyMulti 225 {code}")
+                else:
+                    self.send(f"key {code}")
+            elif c == " ":
+                self.send("key 44")
