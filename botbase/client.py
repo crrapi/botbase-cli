@@ -85,3 +85,7 @@ class BB:
                     self.send(f"key {code}")
             elif c == " ":
                 self.send("key 44")
+
+    def screenshot(self):
+        self.send("pixelPeek")
+        return bytes.fromhex(self.recv())
