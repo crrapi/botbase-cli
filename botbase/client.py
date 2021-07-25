@@ -23,9 +23,18 @@ class BB:
         line, self.buf = self.buf.split(b"\n", 1)
         return line.decode().rstrip("\r")
 
-    def click(self, b): self.send("click " + norm(b))
-    def press(self, b): self.send("press " + norm(b))
-    def release(self, b): self.send("release " + norm(b))
+    # sys-botbase write commands give no reply. so you never know when
+    # they actually ran. trick: send getVersion right after, and wait for
+    # the reply. the main loop handles one line per wakeup in order, so
+    # the version reply proves the write was processed.
+    def _write(self, line):
+        self.send(line)
+        self.send("getVersion")
+        self.recv()
+
+    def click(self, b): self._write("click " + norm(b))
+    def press(self, b): self._write("press " + norm(b))
+    def release(self, b): self._write("release " + norm(b))
 
     def set_stick(self, side, x, y):
         side = side.upper()
