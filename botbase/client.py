@@ -98,3 +98,18 @@ class BB:
     def screenshot(self):
         self.send("pixelPeek")
         return bytes.fromhex(self.recv())
+
+    def sequence(self, steps):
+        # steps: strings click, ints wait ms, ("press", "A") etc.
+        # clickSeq exists on the server but it has a strtok bug where button
+        # names can break into letters. doing it client side is slower but
+        # actually works.
+        import time
+        for step in steps:
+            if isinstance(step, int):
+                time.sleep(step / 1000)
+            elif isinstance(step, str):
+                self.click(step)
+            else:
+                op, *args = step
+                getattr(self, op)(*args)
