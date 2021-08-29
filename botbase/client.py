@@ -113,3 +113,9 @@ class BB:
             else:
                 op, *args = step
                 getattr(self, op)(*args)
+
+    def configure(self, name, value):
+        self._write(f"configure {name} {value}")
+
+    def fast(self):
+        self.configure("mainLoopSleepTime", 0)
