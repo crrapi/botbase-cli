@@ -119,3 +119,11 @@ class BB:
 
     def fast(self):
         self.configure("mainLoopSleepTime", 0)
+
+    def fd_count(self):
+        self.send("fdCount")
+        return int(self.recv())
+
+    def charge(self):
+        self.send("charge")
+        return int(self.recv())
