@@ -131,3 +131,5 @@ class BB:
     def freeze_clear(self): self._write("freezeClear")
     def freeze_pause(self): self._write("freezePause")
     def freeze_unpause(self): self._write("freezeUnpause")
+
+    def detach(self): self._write("detachController")
