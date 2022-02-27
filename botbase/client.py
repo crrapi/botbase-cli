@@ -132,4 +132,28 @@ class BB:
     def freeze_pause(self): self._write("freezePause")
     def freeze_unpause(self): self._write("freezeUnpause")
 
+    def title_version(self):
+        self.send("getTitleVersion")
+        r = self.recv()
+        return int(r, 16) if r else None
+
+    def build_id(self):
+        self.send("getBuildID")
+        return self.recv() or None
+
+    def main_nso_base(self):
+        self.send("getMainNsoBase")
+        r = self.recv()
+        return int(r, 16) if r else None
+
+    def heap_base(self):
+        self.send("getHeapBase")
+        r = self.recv()
+        return int(r, 16) if r else None
+
+    def game_info(self, field):
+        assert field in ("name", "author", "version", "rating")
+        self.send(f"game {field}")
+        return self.recv()
+
     def detach(self): self._write("detachController")
