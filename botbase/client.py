@@ -157,3 +157,11 @@ class BB:
         return self.recv()
 
     def detach(self): self._write("detachController")
+
+    def pointer_peek_multi(self, reads):
+        parts = []
+        for i, (size, chain, final) in enumerate(reads):
+            if i: parts.append("*")
+            parts.extend([f"0x{size:x}"] + [f"0x{c:x}" for c in chain] + [f"0x{final:x}"])
+        self.send("pointerPeekMulti " + " ".join(parts))
+        return bytes.fromhex(self.recv())
