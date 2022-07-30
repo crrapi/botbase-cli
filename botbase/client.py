@@ -165,3 +165,8 @@ class BB:
             parts.extend([f"0x{size:x}"] + [f"0x{c:x}" for c in chain] + [f"0x{final:x}"])
         self.send("pointerPeekMulti " + " ".join(parts))
         return bytes.fromhex(self.recv())
+
+    def go_home(self):
+        import time
+        self.click("HOME")
+        time.sleep(1)
