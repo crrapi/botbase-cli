@@ -16,3 +16,8 @@ US_LAYOUT = {
     "-": (45, False), "=": (46, False), "_": (45, True), "+": (46, True),
     ".": (55, False), ",": (54, False), "?": (56, True), "/": (56, False),
 }
+
+CONTROLLER_TYPES = {
+    "joycon-right": 1, "joycon-left": 2, "pro": 3,
+    "pokeball": 12,
+}
