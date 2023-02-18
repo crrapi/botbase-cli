@@ -149,7 +149,15 @@ class BB:
     def heap_base(self):
         self.send("getHeapBase")
         r = self.recv()
-        return int(r, 16) if r else None
+        if not r:
+            return None
+        v = int(r, 16)
+        # any value below 1MB means the debug attach failed. probably dmnt
+        # is holding the game. getHeapBase then prints whatever was left
+        # in svcGetInfo's output variable, which on hos 22 is 0x4.
+        if v < 0x100000:
+            raise RuntimeError(f"heap base {v:#x} - another debugger has the game")
+        return v
 
     def game_info(self, field):
         assert field in ("name", "author", "version", "rating")
