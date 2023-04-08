@@ -26,3 +26,8 @@ build. holding L at launch doesnt help - saltynx forces the attach AFTER.
 
 workaround: rename the cheats folder for that game. or disable saltynx.
 or use dmnt:cht service instead.
+
+
+2023-04: wireguard routes the switchs subnet so every connect goes into
+the tunnel. nothing answers. need to pin the socket to the physical
+interface.
