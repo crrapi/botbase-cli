@@ -1,4 +1,4 @@
-import socket
+import socket, sys
 from .constants import BUTTONS, ALIAS, DEFAULT_PORT
 
 def norm(b):
@@ -9,8 +9,17 @@ def norm(b):
 
 
 class BB:
-    def __init__(self, host, port=DEFAULT_PORT):
+    def __init__(self, host, port=DEFAULT_PORT, interface=None):
         self.s = socket.socket()
+        if interface:
+            if sys.platform == "darwin":
+                # IP_BOUND_IF, macOS specific. forces outgoing packets through
+                # this interface no matter what the route table says.
+                self.s.setsockopt(socket.IPPROTO_IP, 25, socket.if_nametoindex(interface))
+            elif sys.platform.startswith("linux"):
+                self.s.setsockopt(socket.SOL_SOCKET, 25, interface.encode() + b"\0")
+            else:
+                raise RuntimeError("no interface pinning on " + sys.platform)
         self.s.connect((host, port))
         self.buf = b""
 
