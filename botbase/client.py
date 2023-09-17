@@ -187,3 +187,10 @@ class BB:
         import time
         self.click("HOME")
         time.sleep(1)
+
+    def pointer_relative(self, chain, final=0):
+        self.send("pointerRelative " + " ".join(f"0x{c:x}" for c in chain) + f" 0x{final:x}")
+        return int(self.recv(), 16)
+
+    def pointer_poke(self, data, chain, final=0):
+        self.send(f"pointerPoke 0x{data.hex()} " + " ".join(f"0x{c:x}" for c in chain) + f" 0x{final:x}")
