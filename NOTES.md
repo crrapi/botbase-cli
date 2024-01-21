@@ -31,3 +31,14 @@ or use dmnt:cht service instead.
 2023-04: wireguard routes the switchs subnet so every connect goes into
 the tunnel. nothing answers. need to pin the socket to the physical
 interface.
+
+
+2024-01: updated to hos 22.1.0 and now sys-botbase crashes at boot
+around 30s in. error 2001-0132. thats svc::ResultLimitReached. memory.
+
+atmosphere gives homebrew sysmodules 32MB of extra system memory,
+shared. newer hos uses more of its own system pool. less margin.
+sys-botbase official 2.5 wants ~4.7MB image + ~2MB socket buffers.
+
+happens in am or hid depending on which process allocates last.
+disabling two sysmodules i wasnt using fixed it (recovered ~2.2MB).
