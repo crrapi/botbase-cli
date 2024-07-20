@@ -42,3 +42,16 @@ sys-botbase official 2.5 wants ~4.7MB image + ~2MB socket buffers.
 
 happens in am or hid depending on which process allocates last.
 disabling two sysmodules i wasnt using fixed it (recovered ~2.2MB).
+
+
+2024-07: python is fine. its also slow. a click round trip is 50ms
+server side but my python adds another 5-10ms. mostly fine. but ctrl-c
+leaves buttons held because the signal is caught mid-wait and there is
+no good way to unwind.
+
+also theres no proper type safety anywhere. button names string typed.
+every dsl thing reinvented.
+
+been thinking about rewriting in c++. not because python is bad but
+because i want the single binary, real signal handling, and no interp
+startup. maybe try just the socket + fence layer first.
