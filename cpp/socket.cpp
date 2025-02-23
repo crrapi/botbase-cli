@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <stdexcept>
 #include <cstring>
+#include <net/if.h>
 
 #if defined(__APPLE__) && !defined(IP_BOUND_IF)
 #define IP_BOUND_IF 25
@@ -12,8 +13,21 @@
 
 namespace botbase {
 
-Socket::Socket(const std::string& host, std::uint16_t port, const std::string&) {
+static void bind_interface(int fd, const std::string& interface) {
+#if defined(__APPLE__)
+    unsigned idx = if_nametoindex(interface.c_str());
+    if (!idx) throw std::runtime_error("no interface " + interface);
+    setsockopt(fd, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof idx);
+#elif defined(__linux__)
+    setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, interface.c_str(), interface.size() + 1);
+#else
+    throw std::runtime_error("no interface binding on this platform");
+#endif
+}
+
+Socket::Socket(const std::string& host, std::uint16_t port, const std::string& interface) {
     fd_ = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (!interface.empty()) bind_interface(fd_, interface);
     sockaddr_in a{};
     a.sin_family = AF_INET;
     a.sin_port = htons(port);
