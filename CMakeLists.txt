@@ -12,3 +12,9 @@ add_executable(bb_cpp
 )
 target_include_directories(bb_cpp PRIVATE cpp)
 target_compile_options(bb_cpp PRIVATE -Wall -Wextra)
+
+add_executable(cpp_unit cpp/tests/unit.cpp cpp/input.cpp)
+target_include_directories(cpp_unit PRIVATE cpp)
+
+enable_testing()
+add_test(NAME cpp_unit COMMAND cpp_unit)
