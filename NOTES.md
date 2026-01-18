@@ -55,3 +55,8 @@ every dsl thing reinvented.
 been thinking about rewriting in c++. not because python is bad but
 because i want the single binary, real signal handling, and no interp
 startup. maybe try just the socket + fence layer first.
+
+
+2026-01: the cpp client now tracks what's pressed and releases on
+ctrl-c. python version still has the leak. todo: fix or just finish
+the cpp side.
