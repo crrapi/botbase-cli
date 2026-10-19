@@ -60,3 +60,12 @@ startup. maybe try just the socket + fence layer first.
 2026-01: the cpp client now tracks what's pressed and releases on
 ctrl-c. python version still has the leak. todo: fix or just finish
 the cpp side.
+
+
+2026-10: hardware verification. ran the cli against the real console
+with switch sports running. read-only commands + UNUSED button so
+nothing changes in-game. everything works. --fast cuts a 10-click burst
+from 1.6s to 0.9s. interrupts release held buttons. good.
+
+considering renaming the repo to botbase-cli - more accurate about what
+it is. the python-client name is a lie now
