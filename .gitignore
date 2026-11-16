@@ -1,0 +1,7 @@
+build/
+compile_commands.json
+.cache/
+__pycache__/
+*.jpg
+!docs/*.jpg
+dist/
