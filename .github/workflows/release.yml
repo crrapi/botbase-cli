@@ -1,0 +1,91 @@
+name: Release
+
+# A v* tag builds every target and publishes a GitHub release.
+# Running it by hand builds the same archives without publishing anything.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: linux-${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v7
+
+      # Alpine's musl links fully static, so one binary runs on any distro.
+      - name: Build and test in Alpine
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src alpine:3.20 sh -euc '
+            apk add --no-cache build-base cmake python3 linux-headers
+            cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBOTBASE_STATIC=ON -DBOTBASE_BUILD_EXAMPLES=OFF
+            cmake --build build --parallel
+            ctest --test-dir build --output-on-failure
+            strip build/botbase
+          '
+          file build/botbase
+
+      - name: Package
+        run: scripts/package.sh linux-${{ matrix.arch }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux-${{ matrix.arch }}
+          path: dist/*
+
+  macos:
+    name: macos-universal
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # 13.3 is the oldest macOS whose libc++ has floating-point to_chars.
+      - name: Build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBOTBASE_BUILD_EXAMPLES=OFF \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=13.3
+          cmake --build build --parallel
+          strip build/botbase
+          lipo -info build/botbase
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Package
+        run: scripts/package.sh macos-universal
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos-universal
+          path: dist/*
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [linux, macos]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd dist && sha256sum *.tar.gz > SHA256SUMS
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
